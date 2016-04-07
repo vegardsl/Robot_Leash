@@ -8,10 +8,14 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 
+import java.util.ArrayList;
 import java.util.Set;
 
 
@@ -21,11 +25,15 @@ public class StartActivity extends Activity {
     private static final int REQUEST_ENABLE_BT = 1;
     BluetoothAdapter mBluetoothAdapter;
     ArrayAdapter mArrayAdapter;
+    ArrayList<BluetoothDevice> deviceArrayList = new ArrayList<>();
+
+    Button scanButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_start);
+
 
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         if(mBluetoothAdapter == null){
@@ -42,13 +50,21 @@ public class StartActivity extends Activity {
             // Loop through paired devices
             for (BluetoothDevice device : pairedDevices) {
                 // Add the name and address to an array adapter to show in a ListView
-                mArrayAdapter.add(device.getName() + "\n" + device.getAddress());
+                deviceArrayList.add(device);
             }
         }
 
         // Register the BroadcastReceiver
         IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
         registerReceiver(mReceiver, filter); // Don't forget to unregister during onDestroy
+
+        scanButton = (Button) findViewById(R.id.scanButton);
+        scanButton.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                scanButtonClickHandler();
+            }
+        });
+
     }
 
     @Override
@@ -82,8 +98,14 @@ public class StartActivity extends Activity {
                 // Get the BluetoothDevice object from the Intent
                 BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
                 // Add the name and address to an array adapter to show in a ListView
-                mArrayAdapter.add(device.getName() + "\n" + device.getAddress());
+                deviceArrayList.add(device);
             }
         }
     };
+
+    private void scanButtonClickHandler()
+    {
+        Log.i("TAG", "Scan Button Clicked");
+        return;
+    }
 }
