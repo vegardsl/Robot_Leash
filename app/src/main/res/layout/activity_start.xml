@@ -8,21 +8,24 @@
     <LinearLayout
         android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:weightSum="1">
 
         <ListView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/deviceListView"
             android:layout_alignParentTop="true"
-            android:layout_alignParentStart="true" />
+            android:layout_alignParentStart="true"
+            android:layout_weight="1"/>
 
         <LinearLayout
             android:orientation="horizontal"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
-            android:layout_alignParentStart="true">
+            android:layout_alignParentStart="true"
+            android:layout_weight="0">
 
             <Button
                 android:layout_width="match_parent"
@@ -32,7 +35,8 @@
                 android:enabled="true"
                 android:layout_weight="1"
                 android:clickable="true"
-                android:gravity="left|bottom" />
+                android:gravity="left|bottom"
+                android:layout_gravity="bottom" />
         </LinearLayout>
     </LinearLayout>
 </RelativeLayout>

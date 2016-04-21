@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="horizontal" android:layout_width="match_parent"
-    android:layout_height="100dp"
+    android:layout_height="90dp"
     android:background="@drawable/list_item_background">
 
     <LinearLayout
@@ -16,7 +16,8 @@
             android:textAppearance="?android:attr/textAppearanceMedium"
             android:text="NAME:"
             android:id="@+id/nameLabel"
-            android:layout_gravity="right" />
+            android:layout_gravity="right"
+            android:textSize="15dp" />
 
         <TextView
             android:layout_width="wrap_content"
@@ -24,7 +25,8 @@
             android:textAppearance="?android:attr/textAppearanceMedium"
             android:text="PROXIMITY:"
             android:id="@+id/proximityLabel"
-            android:layout_gravity="right" />
+            android:layout_gravity="right"
+            android:textSize="15dp" />
 
         <TextView
             android:layout_width="wrap_content"
@@ -32,7 +34,8 @@
             android:textAppearance="?android:attr/textAppearanceMedium"
             android:text="PAIRING:"
             android:id="@+id/pairingLabel"
-            android:layout_gravity="right" />
+            android:layout_gravity="right"
+            android:textSize="15dp" />
 
         <TextView
             android:layout_width="wrap_content"
@@ -40,7 +43,8 @@
             android:textAppearance="?android:attr/textAppearanceMedium"
             android:text="MAC:"
             android:id="@+id/macLabel"
-            android:layout_gravity="right" />
+            android:layout_gravity="right"
+            android:textSize="15dp" />
 
     </LinearLayout>
 
@@ -57,28 +61,32 @@
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceMedium"
             android:text="N/A"
-            android:id="@+id/name_textView" />
+            android:id="@+id/name_textView"
+            android:textSize="15dp" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceMedium"
             android:text="N/A"
-            android:id="@+id/proximity_textView" />
+            android:id="@+id/proximity_textView"
+            android:textSize="15dp" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceMedium"
             android:text="NOT PAIRED"
-            android:id="@+id/pairing_textView" />
+            android:id="@+id/pairing_textView"
+            android:textSize="15dp" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceMedium"
             android:text="N/A"
-            android:id="@+id/mac_textView" />
+            android:id="@+id/mac_textView"
+            android:textSize="15dp" />
 
     </LinearLayout>
 

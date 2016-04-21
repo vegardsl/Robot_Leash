@@ -12,6 +12,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
 
@@ -20,6 +21,7 @@ import java.util.Set;
 
 
 public class StartActivity extends Activity {
+    public final static String DEVICE_MESSAGE = "mobile_autonomous_robot.robotleash.MESSAGE";
 
     //Locally defined integer greater than one.
     private static final int REQUEST_ENABLE_BT = 1;
@@ -40,6 +42,13 @@ public class StartActivity extends Activity {
         deviceList = (ListView) findViewById(R.id.deviceListView);
         deviceListAdapter = new DeviceListAdapter(this);
         deviceList.setAdapter(deviceListAdapter);
+        deviceList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                BluetoothDevice device = (BluetoothDevice)deviceList.getItemAtPosition(position);
+                onListItemClickHandler(view, device);
+            }
+        });
 
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         if(mBluetoothAdapter == null){
@@ -66,6 +75,13 @@ public class StartActivity extends Activity {
     }
 
     @Override
+    protected void onResume(){
+        super.onResume();
+        // TODO: Clear list
+        queryPairedDevices();
+    }
+
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_start, menu);
@@ -87,6 +103,12 @@ public class StartActivity extends Activity {
         return super.onOptionsItemSelected(item);
     }
 
+    @Override
+    public void onDestroy(){
+        unregisterReceiver(mReceiver);
+        super.onDestroy();
+    }
+
     // Create a BroadcastReceiver for ACTION_FOUND
     private final BroadcastReceiver mReceiver = new BroadcastReceiver() {
         public void onReceive(Context context, Intent intent) {
@@ -97,6 +119,7 @@ public class StartActivity extends Activity {
                 BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
                 // Add the name and address to an array adapter to show in a ListView
                 deviceListAdapter.deviceArrayList.add(device);
+                Log.i("TAG", "Found new device");
                 deviceListAdapter.notifyDataSetChanged();
             }
         }
@@ -110,6 +133,7 @@ public class StartActivity extends Activity {
             for (BluetoothDevice device : pairedDevices) {
                 // Add the name and address to an array adapter to show in a ListView
                 deviceListAdapter.deviceArrayList.add(device);
+                Log.i("TAG", "Found paired device");
                 deviceListAdapter.notifyDataSetChanged();
             }
         }
@@ -118,11 +142,29 @@ public class StartActivity extends Activity {
     private void scanButtonClickHandler()
     {
         Log.i("TAG", "Scan Button Clicked");
-        if(scanning)
+
+        if(mBluetoothAdapter.isDiscovering())
         {
-            scanning = true;
-            mBluetoothAdapter.startDiscovery();
+            mBluetoothAdapter.cancelDiscovery();
         }
+        scanning = true;
+        mBluetoothAdapter.startDiscovery();
+
         return;
+    }
+
+    public void onListItemClickHandler(View view, BluetoothDevice device) {
+        // Do something when a list item is clicked
+        //Toast.makeText(getApplicationContext(),
+        //        "You selected:" + device.getName(), Toast.LENGTH_SHORT).show();
+        startControlActivity(view, device);
+
+    }
+
+
+    public void startControlActivity(View view, BluetoothDevice device) {
+        Intent intent = new Intent(this, ControlActivity.class);
+        intent.putExtra(DEVICE_MESSAGE,device);
+        startActivity(intent);
     }
 }

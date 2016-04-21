@@ -64,25 +64,12 @@ public class DeviceListAdapter extends BaseAdapter {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent){
-/*
-        LayoutInflater inflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        View row = inflater.inflate(R.layout.device_list_row, parent, false);
-
-        TextView nameText = (TextView) row.findViewById(R.id.name_textView);
-        TextView proximityText = (TextView) row.findViewById(R.id.proximity_textView);
-        TextView pairingText = (TextView) row.findViewById(R.id.pairing_textView);
-        TextView addressText = (TextView) row.findViewById(R.id.mac_textView);
-
-        BluetoothDevice device = deviceArrayList.get(position);
-        nameText.setText(device.getName());
-        //TODO: proximityText.setText(device.get);
-        pairingText.setText(getBondState(device));
-        addressText.setText(device.getAddress());
-*/
 
         View row = convertView;
         ViewHolder holder = null;
 
+        // Optimization of the listView. Find layout objects and store in holder.
+        //Thanks to "slidenerd" on youtube.
         if(row == null) { //First call.
             LayoutInflater inflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             row = inflater.inflate(R.layout.device_list_row, parent, false);

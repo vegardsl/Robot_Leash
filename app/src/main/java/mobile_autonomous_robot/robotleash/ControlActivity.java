@@ -1,9 +1,12 @@
 package mobile_autonomous_robot.robotleash;
 
 import android.app.Activity;
+import android.bluetooth.BluetoothDevice;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 
 public class ControlActivity extends Activity {
@@ -12,6 +15,11 @@ public class ControlActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_control);
+
+        Intent intent = getIntent();
+        BluetoothDevice device = getIntent().getExtras().getParcelable(StartActivity.DEVICE_MESSAGE);
+        Toast.makeText(getApplicationContext(),
+                "You selected:" + device.getName(), Toast.LENGTH_SHORT).show();
     }
 
     @Override
