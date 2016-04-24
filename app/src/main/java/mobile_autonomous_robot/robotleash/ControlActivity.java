@@ -3,6 +3,7 @@ package mobile_autonomous_robot.robotleash;
 import android.app.Activity;
 import android.bluetooth.BluetoothDevice;
 import android.content.Intent;
+import android.opengl.GLSurfaceView;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -10,6 +11,8 @@ import android.widget.Toast;
 
 
 public class ControlActivity extends Activity {
+
+    private GLSurfaceView mGLView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -20,6 +23,8 @@ public class ControlActivity extends Activity {
         BluetoothDevice device = getIntent().getExtras().getParcelable(StartActivity.DEVICE_MESSAGE);
         Toast.makeText(getApplicationContext(),
                 "You selected:" + device.getName(), Toast.LENGTH_SHORT).show();
+
+        mGLView = new MyGLSurfaceView(this);
     }
 
     @Override
