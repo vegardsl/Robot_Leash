@@ -24,7 +24,7 @@ public class ControlActivity extends Activity {
         Toast.makeText(getApplicationContext(),
                 "You selected:" + device.getName(), Toast.LENGTH_SHORT).show();
 
-        mGLView = new MyGLSurfaceView(this);
+        mGLView = new GLSurfaceView(this);
     }
 
     @Override
