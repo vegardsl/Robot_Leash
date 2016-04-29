@@ -4,10 +4,6 @@ import android.content.Context;
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
 
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
-import java.nio.FloatBuffer;
-
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
@@ -15,13 +11,9 @@ import mobile_autonomous_robot.robotleash.objects.ControlPad;
 import mobile_autonomous_robot.robotleash.objects.ControlStick;
 import mobile_autonomous_robot.robotleash.programs.ColorShaderProgram;
 import mobile_autonomous_robot.robotleash.programs.TextureShaderProgram;
-import mobile_autonomous_robot.robotleash.util.LoggerConfig;
-import mobile_autonomous_robot.robotleash.util.ShaderHelper;
-import mobile_autonomous_robot.robotleash.util.TextResourceReader;
 import mobile_autonomous_robot.robotleash.util.TextureHelper;
 
 import static android.opengl.Matrix.multiplyMM;
-import static android.opengl.Matrix.orthoM;
 import static android.opengl.Matrix.perspectiveM;
 import static android.opengl.Matrix.rotateM;
 import static android.opengl.Matrix.setIdentityM;
@@ -33,24 +25,6 @@ import static android.opengl.Matrix.translateM;
  */
 public class ControlRenderer implements GLSurfaceView.Renderer{
     private static final String TAG = "ControlRenderer";
-/*
-    private static final String U_MATRIX = "u_Matrix";
-    private final float[] projectionMatrix = new float[16];
-    private int uMatrixLocation;
-    private static final String A_POSITION = "a_Position";
-    private static final int POSITION_COMPONENT_COUNT = 4;
-    private static final int BYTES_PER_FLOAT = 4;
-    private final FloatBuffer vertexData;
-    private final Context context;
-    private int program;
-    private int aPositionLocation;
-
-    private static final String A_COLOR = "a_Color";
-    private static final int COLOR_COMPONENT_COUNT = 3;
-    private static final int STRIDE =
-            (POSITION_COMPONENT_COUNT + COLOR_COMPONENT_COUNT) * BYTES_PER_FLOAT;
-    private int aColorLocation;
-*/
 
     private final Context context;
     private final float[] projectionMatrix = new float[16];
@@ -67,35 +41,7 @@ public class ControlRenderer implements GLSurfaceView.Renderer{
 
     private ControlStick controlStick;
     private ControlPad controlPad;
-/*
-    public ControlRenderer(Context context) {
-        this.context = context;
-        float[] tableVerticesWithTriangles = {
-                // Order of coordinates: X, Y, Z, W, R, G, B
 
-                // Triangle Fan
-                0f, 0f, 0f, 1.5f, 1f, 1f, 1f,
-                -0.5f, -0.8f, 0f, 1f, 0.7f, 0.7f, 0.7f,
-                0.5f, -0.8f, 0f, 1f, 0.7f, 0.7f, 0.7f,
-                0.5f, 0.8f, 0f, 2f, 0.7f, 0.7f, 0.7f,
-                -0.5f, 0.8f, 0f, 2f, 0.7f, 0.7f, 0.7f,
-                -0.5f, -0.8f, 0f, 1f, 0.7f, 0.7f, 0.7f,
-
-                // Line 1
-                -0.5f, 0f, 0f, 1.5f, 1f, 0f, 0f,
-                0.5f, 0f, 0f, 1.5f, 1f, 0f, 0f,
-
-                // Mallets
-                0f, -0.4f, 0f, 1.25f, 0f, 0f, 1f,
-                0f, 0.4f, 0f, 1.75f, 1f, 0f, 0f
-        };
-        vertexData = ByteBuffer
-                .allocateDirect(tableVerticesWithTriangles.length * BYTES_PER_FLOAT)
-                .order(ByteOrder.nativeOrder())
-                .asFloatBuffer();
-        vertexData.put(tableVerticesWithTriangles);
-    }
-*/
     public ControlRenderer(Context context) {
     this.context = context;
 }
@@ -180,8 +126,6 @@ public class ControlRenderer implements GLSurfaceView.Renderer{
     }
 
     private void positionControlPadInScene() {
-// The table is defined in terms of X & Y coordinates, so we rotate it
-// 90 degrees to lie flat on the XZ plane.
         setIdentityM(modelMatrix, 0);
         rotateM(modelMatrix, 0, 0f, 1f, 0f, 0f);
         multiplyMM(modelViewProjectionMatrix, 0, viewProjectionMatrix,
