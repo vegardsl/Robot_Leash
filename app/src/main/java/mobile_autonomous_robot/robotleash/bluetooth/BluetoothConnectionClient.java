@@ -1,4 +1,4 @@
-package mobile_autonomous_robot.robotleash;
+package mobile_autonomous_robot.robotleash.bluetooth;
 
 import android.app.Service;
 import android.content.Intent;

@@ -1,4 +1,4 @@
-package mobile_autonomous_robot.robotleash;
+package mobile_autonomous_robot.robotleash.objects;
 
 import java.nio.FloatBuffer;
 
