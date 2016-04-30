@@ -3,20 +3,26 @@ package mobile_autonomous_robot.robotleash;
 import android.content.Context;
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
+import android.util.Log;
 
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
 import mobile_autonomous_robot.robotleash.objects.ControlPad;
 import mobile_autonomous_robot.robotleash.objects.ControlStick;
-import mobile_autonomous_robot.robotleash.objects.Mallet;
-import mobile_autonomous_robot.robotleash.objects.Puck;
-
 import mobile_autonomous_robot.robotleash.programs.ColorShaderProgram;
 import mobile_autonomous_robot.robotleash.programs.TextureShaderProgram;
+import mobile_autonomous_robot.robotleash.util.Geometry;
+import mobile_autonomous_robot.robotleash.util.Geometry.Plane;
+import mobile_autonomous_robot.robotleash.util.Geometry.Point;
+import mobile_autonomous_robot.robotleash.util.Geometry.Ray;
+import mobile_autonomous_robot.robotleash.util.Geometry.Sphere;
+import mobile_autonomous_robot.robotleash.util.Geometry.Vector;
 import mobile_autonomous_robot.robotleash.util.TextureHelper;
 
+import static android.opengl.Matrix.invertM;
 import static android.opengl.Matrix.multiplyMM;
+import static android.opengl.Matrix.multiplyMV;
 import static android.opengl.Matrix.perspectiveM;
 import static android.opengl.Matrix.rotateM;
 import static android.opengl.Matrix.setIdentityM;
@@ -32,6 +38,7 @@ public class ControlRenderer implements GLSurfaceView.Renderer{
     private final Context context;
     private final float[] projectionMatrix = new float[16];
     private final float[] modelMatrix = new float[16];
+    private final float[] invertedViewProjectionMatrix = new float[16];
 
     private TextureShaderProgram textureProgram;
     private ColorShaderProgram colorProgram;
@@ -45,8 +52,11 @@ public class ControlRenderer implements GLSurfaceView.Renderer{
     private ControlStick controlStick;
     private ControlPad controlPad;
 
-    private Mallet mallet;
-    private Puck puck;
+    private boolean controlStickPressed = false;
+    private Point controlStickPosition;
+
+    //private Mallet mallet;
+    //private Puck puck;
 
     public ControlRenderer(Context context) {
     this.context = context;
@@ -55,11 +65,13 @@ public class ControlRenderer implements GLSurfaceView.Renderer{
     public void onSurfaceCreated(GL10 unused, EGLConfig config) {
         // Set the background frame color
         GLES20.glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-        controlStick = new ControlStick(0.05f, 0.7f, 32);
+        controlStick = new ControlStick(0.07f, 0.3f, 32);
         controlPad = new ControlPad();
 
-        mallet = new Mallet(0.08f, 0.15f, 32);
-        puck = new Puck(0.06f, 0.02f, 32);
+        //mallet = new Mallet(0.08f, 0.15f, 32);
+        //puck = new Puck(0.06f, 0.02f, 32);
+
+        controlStickPosition = new Point(0f, 0f, controlStick.height / 2f);
 
         textureProgram = new TextureShaderProgram(context);
         colorProgram = new ColorShaderProgram(context);
@@ -81,7 +93,9 @@ public class ControlRenderer implements GLSurfaceView.Renderer{
         // Redraw background color
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
         multiplyMM(viewProjectionMatrix, 0, projectionMatrix, 0, viewMatrix, 0);
+        invertM(invertedViewProjectionMatrix, 0, viewProjectionMatrix, 0);
 
+        // Draw the control pad
         positionControlPadInScene();
         textureProgram.useProgram();
         textureProgram.setUniforms(modelViewProjectionMatrix, texture);
@@ -89,7 +103,9 @@ public class ControlRenderer implements GLSurfaceView.Renderer{
         controlPad.draw();
 
         // Draw the control stick.
-        positionObjectInScene(0f, 0f, controlStick.height / 2f);
+        positionObjectInScene(  controlStickPosition.x,
+                                controlStickPosition.y,
+                                controlStickPosition.z);
         colorProgram.useProgram();
         colorProgram.setUniforms(modelViewProjectionMatrix, 0.2f, 0.2f, 1f);
         controlStick.bindData(colorProgram);
@@ -117,4 +133,70 @@ public class ControlRenderer implements GLSurfaceView.Renderer{
                 0, modelMatrix, 0);
     }
 
+    private Ray convertNormalized2DPointToRay(
+            float normalizedX, float normalizedY){
+        final float[] nearPointNdc = {normalizedX, normalizedY, -1, 1};
+        final float[] farPointNdc = {normalizedX, normalizedY, 1, 1};
+
+        final float[] nearPointWorld = new float[4];
+        final float[] farPointWorld = new float[4];
+
+        multiplyMV(nearPointWorld, 0,
+                invertedViewProjectionMatrix, 0,
+                nearPointNdc, 0);
+        multiplyMV(farPointWorld, 0,
+                invertedViewProjectionMatrix, 0,
+                farPointNdc, 0);
+        divideByW(nearPointWorld);
+        divideByW(farPointWorld);
+
+        Point nearPointRay = new Point( nearPointWorld[0],
+                                        nearPointWorld[1],
+                                        nearPointWorld[2]);
+        Point farPointRay = new Point(  farPointWorld[0],
+                                        farPointWorld[1],
+                                        farPointWorld[2]);
+        Vector vector = Geometry.vectorBetween(nearPointRay, farPointRay);
+
+        return new Ray(nearPointRay, vector);
+        //return new Ray(nearPointRay,
+        //        Geometry.vectorBetween(nearPointRay, farPointRay));
+    }
+
+    private void divideByW(float[] vector){
+        vector[0] /= vector[3];
+        vector[1] /= vector[3];
+        vector[2] /= vector[3];
+    }
+
+
+    public void handleTouchPress(float normalizedX, float normalizedY){
+        Log.v(TAG, "handleTouchPress, x = " + normalizedX + " y =  " + normalizedY);
+        Ray ray = convertNormalized2DPointToRay(normalizedX, normalizedY);
+
+        // Now test if this ray intersects with the control stick by creating
+        // a bounding sphere that wraps the stick.
+        Sphere controlStickBoundingSphere = new Sphere(new Point(
+                controlStickPosition.x,
+                controlStickPosition.y,
+                controlStickPosition.z),
+                controlStick.height / 2f);
+        // if the ray intersects with the bounding sphere,
+        // then set controlStickPressed = true.
+        controlStickPressed = Geometry.intersects(
+                controlStickBoundingSphere, ray);
+    }
+
+    public void handleTouchDrag(float normalizedX, float normalizedY){
+
+        if(controlStickPressed){
+            Log.v(TAG, "handleTouchDrag, x = " + normalizedX + ", y = " + normalizedY );
+            Ray ray = convertNormalized2DPointToRay(normalizedX, normalizedY);
+            Plane plane = new Plane(new Point(0,0,0), new Vector(0, 0, 1));
+            Point touchedPoint = Geometry.intersectionPoint(ray, plane);
+            controlStickPosition = new Point(touchedPoint.x,
+                                            touchedPoint.y,
+                                            controlStick.height / 2f);
+        }
+    }
 }
