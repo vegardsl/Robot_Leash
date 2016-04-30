@@ -3,6 +3,7 @@ package mobile_autonomous_robot.robotleash;
 import android.content.Context;
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
+import android.os.SystemClock;
 import android.util.Log;
 
 import javax.microedition.khronos.egl.EGLConfig;
@@ -54,9 +55,19 @@ public class ControlRenderer implements GLSurfaceView.Renderer{
 
     private boolean controlStickPressed = false;
     private Point controlStickPosition;
+    private Point prevControlStickPosition;
+    private Vector deltaControlStickPosition;
 
-    //private Mallet mallet;
-    //private Puck puck;
+    private final float leftBound = -0.5f;
+    private final float rightBound = 0.5f;
+    private final float upperBound = -0.8f;
+    private final float lowerBound = 0.8f;
+
+    private long currentTimeStamp_ms;
+    private long lastTimeStamp_ms;
+    private long deltaTime_ms;
+
+    private Point stickVel;
 
     public ControlRenderer(Context context) {
     this.context = context;
@@ -72,10 +83,15 @@ public class ControlRenderer implements GLSurfaceView.Renderer{
         //puck = new Puck(0.06f, 0.02f, 32);
 
         controlStickPosition = new Point(0f, 0f, controlStick.height / 2f);
-
+        prevControlStickPosition = new Point(0f, 0f, controlStick.height / 2f);
+        deltaControlStickPosition = Geometry.vectorBetween(controlStickPosition, prevControlStickPosition);
         textureProgram = new TextureShaderProgram(context);
         colorProgram = new ColorShaderProgram(context);
         texture = TextureHelper.loadTexture(context, R.drawable.control_pad2);
+
+        //stickVel = new Point(0,0,0);
+
+        lastTimeStamp_ms = SystemClock.currentThreadTimeMillis();
     }
 
     @Override
@@ -117,6 +133,14 @@ public class ControlRenderer implements GLSurfaceView.Renderer{
         mallet.bindData(colorProgram);
         mallet.draw();
   */
+        lastTimeStamp_ms = currentTimeStamp_ms;
+        currentTimeStamp_ms = SystemClock.currentThreadTimeMillis();
+        deltaTime_ms = currentTimeStamp_ms - lastTimeStamp_ms;
+        if(!controlStickPressed){
+
+            Log.v(TAG, "dt = " +deltaTime_ms);
+            centerControlStick();
+        }
     }
 
     private void positionControlPadInScene() {
@@ -194,9 +218,45 @@ public class ControlRenderer implements GLSurfaceView.Renderer{
             Ray ray = convertNormalized2DPointToRay(normalizedX, normalizedY);
             Plane plane = new Plane(new Point(0,0,0), new Vector(0, 0, 1));
             Point touchedPoint = Geometry.intersectionPoint(ray, plane);
+            prevControlStickPosition = controlStickPosition;
             controlStickPosition = new Point(touchedPoint.x,
                                             touchedPoint.y,
                                             controlStick.height / 2f);
+            deltaControlStickPosition = Geometry.vectorBetween(controlStickPosition,
+                    prevControlStickPosition);
         }
+    }
+
+    public void handleTouchRelease(){
+        controlStickPressed = false;
+    }
+
+    public void centerControlStick(){
+
+        float xvel = 0f, yvel = 0f;
+        float Fx = 0f, Fy = 0f;
+
+        // Spring mass dampener system coefficients.
+        float k = 300, c = 100f, m = 5f;
+
+        float dt = 1f / (1000f * (float)deltaTime_ms); // In seconds;
+
+        xvel = deltaControlStickPosition.x*dt;
+        yvel = deltaControlStickPosition.y*dt;
+
+        Fx = (-1f)*controlStickPosition.x*k;// + c*(deltaControlStickPosition.x / dt);
+        Fy = (-1f)*controlStickPosition.y*k;// + c*(deltaControlStickPosition.y / dt);
+
+        if(Math.abs(Fx) < 0.1f && Math.abs(Fy) < 0.1f){
+            xvel = yvel = 0f;
+        }else{
+            xvel += (Fx/m)*dt;
+            yvel += (Fy/m)*dt;
+        }
+
+        prevControlStickPosition = controlStickPosition;
+        controlStickPosition = new Point(controlStickPosition.x + xvel,
+                                        controlStickPosition.y + yvel,
+                                        controlStickPosition.z);
     }
 }
