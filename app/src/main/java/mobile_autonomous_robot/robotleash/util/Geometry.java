@@ -11,8 +11,14 @@ public class Geometry {
             this.y = y;
             this.z = z;
         }
+        public Point translateX(float distance) {
+            return new Point(x, y, z + distance);
+        }
         public Point translateY(float distance) {
             return new Point(x, y + distance, z);
+        }
+        public Point translateZ(float distance) {
+            return new Point(x, y, z + distance);
         }
     }
 

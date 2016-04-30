@@ -9,6 +9,9 @@ import javax.microedition.khronos.opengles.GL10;
 
 import mobile_autonomous_robot.robotleash.objects.ControlPad;
 import mobile_autonomous_robot.robotleash.objects.ControlStick;
+import mobile_autonomous_robot.robotleash.objects.Mallet;
+import mobile_autonomous_robot.robotleash.objects.Puck;
+
 import mobile_autonomous_robot.robotleash.programs.ColorShaderProgram;
 import mobile_autonomous_robot.robotleash.programs.TextureShaderProgram;
 import mobile_autonomous_robot.robotleash.util.TextureHelper;
@@ -42,6 +45,9 @@ public class ControlRenderer implements GLSurfaceView.Renderer{
     private ControlStick controlStick;
     private ControlPad controlPad;
 
+    private Mallet mallet;
+    private Puck puck;
+
     public ControlRenderer(Context context) {
     this.context = context;
 }
@@ -49,8 +55,12 @@ public class ControlRenderer implements GLSurfaceView.Renderer{
     public void onSurfaceCreated(GL10 unused, EGLConfig config) {
         // Set the background frame color
         GLES20.glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-        controlStick = new ControlStick(0.06f, 0.02f, 32);
+        controlStick = new ControlStick(0.05f, 0.7f, 32);
         controlPad = new ControlPad();
+
+        mallet = new Mallet(0.08f, 0.15f, 32);
+        puck = new Puck(0.06f, 0.02f, 32);
+
         textureProgram = new TextureShaderProgram(context);
         colorProgram = new ColorShaderProgram(context);
         texture = TextureHelper.loadTexture(context, R.drawable.control_pad2);
@@ -78,51 +88,19 @@ public class ControlRenderer implements GLSurfaceView.Renderer{
         controlPad.bindData(textureProgram);
         controlPad.draw();
 
-// Draw the puck.
-
-        positionObjectInScene(0f, controlStick.height / 2f, 0f);
-        colorProgram.setUniforms(modelViewProjectionMatrix, 0.8f, 0.8f, 1f);
+        // Draw the control stick.
+        positionObjectInScene(0f, 0f, controlStick.height / 2f);
+        colorProgram.useProgram();
+        colorProgram.setUniforms(modelViewProjectionMatrix, 0.2f, 0.2f, 1f);
         controlStick.bindData(colorProgram);
         controlStick.draw();
-
-        /*
-
-        GLES20.glUniformMatrix4fv(uMatrixLocation, 1, false, projectionMatrix, 0);
-
-        //Draw table
-        GLES20.glDrawArrays(GLES20.GL_TRIANGLE_FAN, 0, 6);
-
-        //Draw line
-        GLES20.glDrawArrays(GLES20.GL_LINES, 6, 2);
-
-        // Draw the first mallet blue.
-        GLES20.glDrawArrays(GLES20.GL_POINTS, 8, 1);
-        // Draw the second mallet red.
-        GLES20.glDrawArrays(GLES20.GL_POINTS, 9, 1);
-    }
-
-    public void onSurfaceChanged(GL10 unused, int width, int height) {
-        GLES20.glViewport(0, 0, width, height);
 /*
-        // Set the OpenGL viewport to fill the entire surface.
-        GLES20.glViewport(0, 0, width, height);
-
-        final float aspectRatio = width > height ?
-                (float) width / (float) height :
-                (float) height / (float) width;
-        if (width > height) {
-// Landscape
-            orthoM(projectionMatrix, 0, -aspectRatio, aspectRatio, -1f, 1f, -1f, 1f);
-        } else {
-// Portrait or square
-            orthoM(projectionMatrix, 0, -1f, 1f, -aspectRatio, aspectRatio, -1f, 1f);
-        }
-        */
-        /*
-        perspectiveM(projectionMatrix, 0, 45, (float) width
-                / (float) height, 1f, 10f);
-        setLookAtM(viewMatrix, 0, 0f, 1.2f, 2.2f, 0f, 0f, 0f, 0f, 1f, 0f);
-        */
+        positionObjectInScene(0f, 0.6f, mallet.height / 2f);
+        colorProgram.useProgram();
+        colorProgram.setUniforms(modelViewProjectionMatrix, 1f, 0f, 0f);
+        mallet.bindData(colorProgram);
+        mallet.draw();
+  */
     }
 
     private void positionControlPadInScene() {
