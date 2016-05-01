@@ -20,6 +20,9 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Toast;
 
+import java.math.BigInteger;
+import java.util.Arrays;
+
 import mobile_autonomous_robot.robotleash.bluetooth.BluetoothConnectionService;
 
 
@@ -300,6 +303,27 @@ public class ControlActivity extends Activity{
                 case Constants.MESSAGE_STICK_POSITION:
                     float[] pos = msg.getData().getFloatArray(Constants.STICK_POSITION);
                     Log.d(TAG,"Stick position: x = " + pos[0] + " y = " + pos[1]);
+                    int x = Math.round(pos[0] * 400);
+                    int y = Math.round(pos[1] * 400);
+                    // Overflow checks and bounds.
+                    if(x > 127){
+                        x = 127;
+                    }else if(x < -127){
+                        x = -127;
+                    }
+                    if(y > 127){
+                        y = 127;
+                    }else if(y < -127){
+                        y = -127;
+                    }
+                    byte[] array_x = BigInteger.valueOf(x).toByteArray();
+                    byte[] array_y = BigInteger.valueOf(y).toByteArray();
+                    byte[] combined = new byte[array_x.length + array_y.length];
+                    for (int i = 0; i < combined.length; ++i)
+                    {
+                        combined[i] = i < array_x.length ? array_x[i] : array_y[i - array_x.length];
+                    }
+                    System.out.println(Arrays.toString(combined));
             }
         }
     };
