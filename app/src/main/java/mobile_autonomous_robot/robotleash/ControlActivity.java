@@ -298,7 +298,8 @@ public class ControlActivity extends Activity{
         public void handleMessage(Message msg){
             switch(msg.what){
                 case Constants.MESSAGE_STICK_POSITION:
-                    //float pos = msg.getData().getFloat(Constants.STICK_POSITION);
+                    float[] pos = msg.getData().getFloatArray(Constants.STICK_POSITION);
+                    Log.d(TAG,"Stick position: x = " + pos[0] + " y = " + pos[1]);
             }
         }
     };

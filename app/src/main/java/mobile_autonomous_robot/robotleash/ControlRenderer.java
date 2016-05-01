@@ -3,7 +3,9 @@ package mobile_autonomous_robot.robotleash;
 import android.content.Context;
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
+import android.os.Bundle;
 import android.os.Handler;
+import android.os.Message;
 import android.os.SystemClock;
 import android.util.Log;
 
@@ -70,9 +72,12 @@ public class ControlRenderer implements GLSurfaceView.Renderer{
 
     private Point stickVel;
 
-    public ControlRenderer(Context context, Handler mHandler) {
-    this.context = context;
-}
+    private final Handler mHandler;
+
+    public ControlRenderer(Context context, Handler handler) {
+        this.context = context;
+        mHandler = handler;
+    }
     @Override
     public void onSurfaceCreated(GL10 unused, EGLConfig config) {
         // Set the background frame color
@@ -91,6 +96,7 @@ public class ControlRenderer implements GLSurfaceView.Renderer{
         texture = TextureHelper.loadTexture(context, R.drawable.control_pad2);
 
         //stickVel = new Point(0,0,0);
+
 
         lastTimeStamp_ms = SystemClock.currentThreadTimeMillis();
     }
@@ -142,6 +148,14 @@ public class ControlRenderer implements GLSurfaceView.Renderer{
             Log.v(TAG, "dt = " +deltaTime_ms);
             centerControlStick();
         }
+
+        // Send send stick position back to the Activity
+        Message msg = mHandler.obtainMessage(Constants.MESSAGE_STICK_POSITION);
+        Bundle bundle = new Bundle();
+        float[] stickPos = {controlStickPosition.x, controlStickPosition.y};
+        bundle.putFloatArray(Constants.STICK_POSITION,stickPos);
+        msg.setData(bundle);
+        mHandler.sendMessage(msg);
     }
 
     private void positionControlPadInScene() {

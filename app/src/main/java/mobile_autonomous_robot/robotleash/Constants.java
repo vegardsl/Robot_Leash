@@ -19,5 +19,5 @@ public class Constants {
 
     //Control input message tags for the ControlRenderer Handler
     public static final int MESSAGE_STICK_POSITION = 6;
-    public static final float STICK_POSITION = 7;
+    public static final String STICK_POSITION = "stick_position";
 }
