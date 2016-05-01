@@ -15,6 +15,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Set;
@@ -53,6 +54,8 @@ public class StartActivity extends Activity {
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         if(mBluetoothAdapter == null){
             // Device does not support Bluetooth.
+            Toast.makeText(this, "Bluetooth is not available.",
+                    Toast.LENGTH_LONG).show();
         }
         if(!mBluetoothAdapter.isEnabled()){
             Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);

@@ -29,7 +29,7 @@
         </activity>
 
         <service
-            android:name=".bluetooth.BluetoothConnectionClient"
+            android:name=".bluetooth.BluetoothConnectionService"
             android:enabled="true"
             android:exported="true"
             >

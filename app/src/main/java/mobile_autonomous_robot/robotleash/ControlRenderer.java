@@ -3,6 +3,7 @@ package mobile_autonomous_robot.robotleash;
 import android.content.Context;
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
+import android.os.Handler;
 import android.os.SystemClock;
 import android.util.Log;
 
@@ -69,7 +70,7 @@ public class ControlRenderer implements GLSurfaceView.Renderer{
 
     private Point stickVel;
 
-    public ControlRenderer(Context context) {
+    public ControlRenderer(Context context, Handler mHandler) {
     this.context = context;
 }
     @Override
