@@ -12,6 +12,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.os.ParcelUuid;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 import android.view.Menu;
@@ -20,6 +21,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Toast;
 
+import java.lang.ref.WeakReference;
 import java.math.BigInteger;
 import java.util.Arrays;
 
@@ -55,6 +57,69 @@ public class ControlActivity extends Activity{
     // Member object tor the comm. service.
     private BluetoothConnectionService mBluetoothConnectionService;
 
+    /**
+     * Instances of static inner classes do not hold an implicit
+     * reference to their outer class.
+     */
+    private static class MyHandler extends Handler {
+        private final WeakReference<ControlActivity> mActivity;
+
+        public MyHandler(ControlActivity activity) {
+            mActivity = new WeakReference<ControlActivity>(activity);
+        }
+
+        @Override
+        public void handleMessage(Message msg) {
+            ControlActivity activity = mActivity.get();
+            if (activity != null) {
+                // ...
+            }
+            switch(msg.what){
+                case Constants.MESSAGE_STICK_POSITION:
+                    float[] pos = msg.getData().getFloatArray(Constants.STICK_POSITION);
+                    Log.d(TAG,"Stick position: x = " + pos[0] + " y = " + pos[1]);
+                    int x = Math.round(pos[0] * 400);
+                    int y = Math.round(pos[1] * 400);
+                    // Overflow checks and bounds.
+                    if(x > 127){
+                        x = 127;
+                    }else if(x < -127){
+                        x = -127;
+                    }
+                    if(y > 127){
+                        y = 127;
+                    }else if(y < -127){
+                        y = -127;
+                    }
+                    byte[] array_x = BigInteger.valueOf(x).toByteArray();
+                    byte[] array_y = BigInteger.valueOf(y).toByteArray();
+                    int msg_size = array_x.length + array_y.length + 3;
+                    int size_x = array_x.length;
+                    int size_y = array_y.length;
+                    Log.d(TAG, "x_size: " + size_x);
+                    Log.d(TAG, "y_size: " + size_y);
+                    byte[] combined = new byte[msg_size];
+                    //combined[0] = 0x73;
+                   // for (int i = 0; i < combined.length-1; ++i)
+                  //  {
+                  //      combined[i] = i < array_x.length ? array_x[i] : array_y[i - array_x.length];
+                  //  }
+                    combined[0] = 0x73;
+                    combined[1] = array_x[0];
+                    combined[2] = 0x61;
+                    combined[3] = array_y[0];
+                    combined[4] = 0x0A;
+                    //for(int i = 0; i < array_x.length)
+                    System.out.println(Arrays.toString(combined));
+                    //combined[array_x.length + array_y.length] = 0x0A; // End of line in UTF-8. Robot reads line by line.
+                    activity.sendMessage(combined);
+
+            }
+        }
+    }
+
+    private final MyHandler mRendererHandler = new MyHandler(this);
+
 // ----- Activity-specific methods -----
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,6 +130,16 @@ public class ControlActivity extends Activity{
         BluetoothDevice device = getIntent().getExtras().getParcelable(StartActivity.DEVICE_MESSAGE);
         Toast.makeText(getApplicationContext(),
                 "You selected:" + device.getName(), Toast.LENGTH_SHORT).show();
+
+
+        ParcelUuid list[] = device.getUuids();
+        if(list != null){
+            for(int i = 0; i < list.length; i++){
+                Log.d(TAG, "Device uuid: " + list[i].toString());
+            }
+        }
+
+
 
 
         glSurfaceView = new GLSurfaceView(this);
@@ -158,7 +233,7 @@ public class ControlActivity extends Activity{
 
         setContentView(glSurfaceView);
 
-        connectDevice(device, false);
+        connectDevice(device, true);
     }
 
     @Override
@@ -215,7 +290,7 @@ public class ControlActivity extends Activity{
      *
      * @param message A string of text to send.
      */
-    private void sendMessage(String message) {
+    private void sendMessage(byte[] message){//String message) {
         // Check that we're actually connected before trying anything
         if (mBluetoothConnectionService.getState() != BluetoothConnectionService.STATE_CONNECTED) {
             //Toast.makeText(getActivity(), R.string.not_connected, Toast.LENGTH_SHORT).show();
@@ -223,9 +298,9 @@ public class ControlActivity extends Activity{
         }
 
         // Check that there's actually something to send
-        if (message.length() > 0) {
+        if (message.length > 0) {
             // Get the message bytes and tell the BluetoothChatService to write
-            byte[] send = message.getBytes();
+            byte[] send = message;
             mBluetoothConnectionService.write(send);
 
             // Reset out string buffer to zero and clear the edit text field
@@ -241,7 +316,7 @@ public class ControlActivity extends Activity{
     }
 
     /**
-     * The Handler that gets information back from the BluetoothChatService
+     * The Handler that gets information back from the BluetoothConnectionService
      */
     private final Handler mBtHandler = new Handler() {
         @Override
@@ -295,7 +370,7 @@ public class ControlActivity extends Activity{
             }
         }
     };
-
+/*
     private final Handler mRendererHandler = new Handler(){
         @Override
         public void handleMessage(Message msg){
@@ -324,8 +399,10 @@ public class ControlActivity extends Activity{
                         combined[i] = i < array_x.length ? array_x[i] : array_y[i - array_x.length];
                     }
                     System.out.println(Arrays.toString(combined));
+                    this.sendMessage(combined);
+
             }
         }
     };
-
+*/
 }

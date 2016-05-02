@@ -26,7 +26,7 @@ public class BluetoothConnectionService extends Service {
 
     // Class 4 UUIDs generated at https://www.uuidgenerator.net/
     private static final UUID UUID_SECURE =
-            UUID.fromString("38d99d66-52bd-4012-825f-93fec75f720f");
+            UUID.fromString("e8e10f95-1a70-4b27-9ccf-02010264e9c8");
     private static final UUID UUID_INSECURE =
             UUID.fromString("e8e10f95-1a70-4b27-9ccf-02010264e9c8");//dbf467ee-2969-48a0-ad02-2939294a8e05");
 
@@ -351,6 +351,7 @@ public class BluetoothConnectionService extends Service {
                 // Share the sent message back to the UI Activity
                 mHandler.obtainMessage(Constants.MESSAGE_WRITE, -1, -1, buffer)
                         .sendToTarget();
+                Log.i(TAG, "Writing...");
             } catch (IOException e) {
                 Log.e(TAG, "Exception during write", e);
             }
