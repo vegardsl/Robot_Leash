@@ -104,9 +104,9 @@ public class ControlActivity extends Activity{
                   //  {
                   //      combined[i] = i < array_x.length ? array_x[i] : array_y[i - array_x.length];
                   //  }
-                    combined[0] = 0x73;
+                    combined[0] = 0x61;
                     combined[1] = array_x[0];
-                    combined[2] = 0x61;
+                    combined[2] = 0x73;
                     combined[3] = array_y[0];
                     combined[4] = 0x0A;
                     //for(int i = 0; i < array_x.length)
