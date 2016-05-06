@@ -78,7 +78,7 @@ public class ControlActivity extends Activity{
                 case Constants.MESSAGE_STICK_POSITION:
                     float[] pos = msg.getData().getFloatArray(Constants.STICK_POSITION);
                     Log.d(TAG,"Stick position: x = " + pos[0] + " y = " + pos[1]);
-                    int x = Math.round(pos[0] * 400);
+                    int x = -Math.round(pos[0] * 400);
                     int y = Math.round(pos[1] * 400);
                     // Overflow checks and bounds.
                     if(x > 127){
@@ -91,6 +91,7 @@ public class ControlActivity extends Activity{
                     }else if(y < -127){
                         y = -127;
                     }
+                    y = y/2; // Reduce aggressiveness linear command.
                     byte[] array_x = BigInteger.valueOf(x).toByteArray();
                     byte[] array_y = BigInteger.valueOf(y).toByteArray();
                     int msg_size = array_x.length + array_y.length + 3;
@@ -233,7 +234,7 @@ public class ControlActivity extends Activity{
 
         setContentView(glSurfaceView);
 
-        connectDevice(device, true);
+        connectDevice(device, false);
     }
 
     @Override

@@ -81,6 +81,7 @@ public class StartActivity extends Activity {
     protected void onResume(){
         super.onResume();
         // TODO: Clear list
+        deviceListAdapter.deviceArrayList.clear();
         queryPairedDevices();
     }
 
