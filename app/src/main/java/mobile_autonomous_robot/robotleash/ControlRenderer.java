@@ -70,8 +70,6 @@ public class ControlRenderer implements GLSurfaceView.Renderer{
     private long lastTimeStamp_ms;
     private long deltaTime_ms;
 
-    private Point stickVel;
-
     private final Handler mHandler;
 
     public ControlRenderer(Context context, Handler handler) {
@@ -85,18 +83,12 @@ public class ControlRenderer implements GLSurfaceView.Renderer{
         controlStick = new ControlStick(0.07f, 0.3f, 32);
         controlPad = new ControlPad();
 
-        //mallet = new Mallet(0.08f, 0.15f, 32);
-        //puck = new Puck(0.06f, 0.02f, 32);
-
         controlStickPosition = new Point(0f, 0f, controlStick.height / 2f);
         prevControlStickPosition = new Point(0f, 0f, controlStick.height / 2f);
         deltaControlStickPosition = Geometry.vectorBetween(controlStickPosition, prevControlStickPosition);
         textureProgram = new TextureShaderProgram(context);
         colorProgram = new ColorShaderProgram(context);
         texture = TextureHelper.loadTexture(context, R.drawable.control_pad2);
-
-        //stickVel = new Point(0,0,0);
-
 
         lastTimeStamp_ms = SystemClock.currentThreadTimeMillis();
     }
@@ -133,13 +125,7 @@ public class ControlRenderer implements GLSurfaceView.Renderer{
         colorProgram.setUniforms(modelViewProjectionMatrix, 0.2f, 0.2f, 1f);
         controlStick.bindData(colorProgram);
         controlStick.draw();
-/*
-        positionObjectInScene(0f, 0.6f, mallet.height / 2f);
-        colorProgram.useProgram();
-        colorProgram.setUniforms(modelViewProjectionMatrix, 1f, 0f, 0f);
-        mallet.bindData(colorProgram);
-        mallet.draw();
-  */
+
         lastTimeStamp_ms = currentTimeStamp_ms;
         currentTimeStamp_ms = SystemClock.currentThreadTimeMillis();
         deltaTime_ms = currentTimeStamp_ms - lastTimeStamp_ms;
@@ -150,10 +136,22 @@ public class ControlRenderer implements GLSurfaceView.Renderer{
         }
 
         // Send send stick position back to the Activity
-        Message msg = mHandler.obtainMessage(Constants.MESSAGE_STICK_POSITION);
+        /*Message msg = mHandler.obtainMessage(Constants.MESSAGE_STICK_POSITION);
         Bundle bundle = new Bundle();
         float[] stickPos = {controlStickPosition.x, controlStickPosition.y};
         bundle.putFloatArray(Constants.STICK_POSITION,stickPos);
+        msg.setData(bundle);
+        mHandler.sendMessage(msg);*/
+
+        sendStickPosMsg(controlStickPosition.x, controlStickPosition.y);
+    }
+
+    private void sendStickPosMsg(float xPos, float yPos){
+        // Send send stick position back to the Activity
+        Message msg = mHandler.obtainMessage(Constants.MESSAGE_STICK_POSITION);
+        Bundle bundle = new Bundle();
+        float[] stickPos = {xPos, yPos};
+        bundle.putFloatArray(Constants.STICK_POSITION, stickPos);
         msg.setData(bundle);
         mHandler.sendMessage(msg);
     }
@@ -198,8 +196,6 @@ public class ControlRenderer implements GLSurfaceView.Renderer{
         Vector vector = Geometry.vectorBetween(nearPointRay, farPointRay);
 
         return new Ray(nearPointRay, vector);
-        //return new Ray(nearPointRay,
-        //        Geometry.vectorBetween(nearPointRay, farPointRay));
     }
 
     private void divideByW(float[] vector){

@@ -24,7 +24,7 @@ public class BluetoothConnectionService extends Service {
     // Debugging
     private static final String TAG = "BTConnectionService";
 
-    // Class 4 UUIDs generated at https://www.uuidgenerator.net/
+    // Default UUIDs from the BT Chat example. Must match with the robot BT server.
     private static final UUID UUID_SECURE =
             UUID.fromString("e8e10f95-1a70-4b27-9ccf-02010264e9c8");
     private static final UUID UUID_INSECURE =

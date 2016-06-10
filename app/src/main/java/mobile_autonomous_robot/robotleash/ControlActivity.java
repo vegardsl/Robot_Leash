@@ -54,7 +54,7 @@ public class ControlActivity extends Activity{
      */
     private BluetoothAdapter mBluetoothAdapter = null;
 
-    // Member object tor the comm. service.
+    // Member object for the comm. service.
     private BluetoothConnectionService mBluetoothConnectionService;
 
     /**
@@ -81,16 +81,8 @@ public class ControlActivity extends Activity{
                     int x = -Math.round(pos[0] * 400);
                     int y = Math.round(pos[1] * 400);
                     // Overflow checks and bounds.
-                    if(x > 127){
-                        x = 127;
-                    }else if(x < -127){
-                        x = -127;
-                    }
-                    if(y > 127){
-                        y = 127;
-                    }else if(y < -127){
-                        y = -127;
-                    }
+                    x = constrainToMaxCharValue(x);
+                    y =  constrainToMaxCharValue(y);
                     y = y/2; // Reduce aggressiveness linear command.
                     byte[] array_x = BigInteger.valueOf(x).toByteArray();
                     byte[] array_y = BigInteger.valueOf(y).toByteArray();
@@ -117,6 +109,14 @@ public class ControlActivity extends Activity{
 
             }
         }
+        private static int constrainToMaxCharValue(int val) {
+            if(val > 127){
+                val = 127;
+            }else if(val < -127){
+                val = -127;
+            }
+            return val;
+        }
     }
 
     private final MyHandler mRendererHandler = new MyHandler(this);
@@ -132,16 +132,12 @@ public class ControlActivity extends Activity{
         Toast.makeText(getApplicationContext(),
                 "You selected:" + device.getName(), Toast.LENGTH_SHORT).show();
 
-
         ParcelUuid list[] = device.getUuids();
         if(list != null){
             for(int i = 0; i < list.length; i++){
                 Log.d(TAG, "Device uuid: " + list[i].toString());
             }
         }
-
-
-
 
         glSurfaceView = new GLSurfaceView(this);
 
@@ -289,9 +285,9 @@ public class ControlActivity extends Activity{
     /**
      * Sends a message.
      *
-     * @param message A string of text to send.
+     * @param message
      */
-    private void sendMessage(byte[] message){//String message) {
+    private void sendMessage(byte[] message){
         // Check that we're actually connected before trying anything
         if (mBluetoothConnectionService.getState() != BluetoothConnectionService.STATE_CONNECTED) {
             //Toast.makeText(getActivity(), R.string.not_connected, Toast.LENGTH_SHORT).show();
@@ -317,7 +313,7 @@ public class ControlActivity extends Activity{
     }
 
     /**
-     * The Handler that gets information back from the BluetoothConnectionService
+     * The Handler that receives data back from the BluetoothConnectionService
      */
     private final Handler mBtHandler = new Handler() {
         @Override
@@ -371,39 +367,4 @@ public class ControlActivity extends Activity{
             }
         }
     };
-/*
-    private final Handler mRendererHandler = new Handler(){
-        @Override
-        public void handleMessage(Message msg){
-            switch(msg.what){
-                case Constants.MESSAGE_STICK_POSITION:
-                    float[] pos = msg.getData().getFloatArray(Constants.STICK_POSITION);
-                    Log.d(TAG,"Stick position: x = " + pos[0] + " y = " + pos[1]);
-                    int x = Math.round(pos[0] * 400);
-                    int y = Math.round(pos[1] * 400);
-                    // Overflow checks and bounds.
-                    if(x > 127){
-                        x = 127;
-                    }else if(x < -127){
-                        x = -127;
-                    }
-                    if(y > 127){
-                        y = 127;
-                    }else if(y < -127){
-                        y = -127;
-                    }
-                    byte[] array_x = BigInteger.valueOf(x).toByteArray();
-                    byte[] array_y = BigInteger.valueOf(y).toByteArray();
-                    byte[] combined = new byte[array_x.length + array_y.length];
-                    for (int i = 0; i < combined.length; ++i)
-                    {
-                        combined[i] = i < array_x.length ? array_x[i] : array_y[i - array_x.length];
-                    }
-                    System.out.println(Arrays.toString(combined));
-                    this.sendMessage(combined);
-
-            }
-        }
-    };
-*/
 }
