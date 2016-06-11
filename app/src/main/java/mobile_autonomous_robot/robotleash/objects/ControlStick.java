@@ -11,6 +11,10 @@ import mobile_autonomous_robot.robotleash.objects.ObjectBuilder.GeneratedData;
 
 /**
  * Created by Vegard on 21.04.2016.
+ *
+ * Code within this file is based on:
+ * Kevin Brothaler. OpenGL ES 2 for Android. The Pragmatic Programmers, 2013.
+ *
  */
 public class ControlStick {
     private FloatBuffer vertexBuffer;

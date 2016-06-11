@@ -58,8 +58,8 @@ public class ControlActivity extends Activity{
     private BluetoothConnectionService mBluetoothConnectionService;
 
     /**
-     * Instances of static inner classes do not hold an implicit
-     * reference to their outer class.
+     * This class is built up of skeleton code from:     *
+     * http://www.androiddesignpatterns.com/2013/01/inner-class-handler-memory-leak.html
      */
     private static class MyHandler extends Handler {
         private final WeakReference<ControlActivity> mActivity;
@@ -314,6 +314,9 @@ public class ControlActivity extends Activity{
 
     /**
      * The Handler that receives data back from the BluetoothConnectionService
+     *
+     * This code snippet is copied from the "android-BluetoothChat" sample at
+     * https://github.com/googlesamples/android-BluetoothChat/blob/master/Application/src/main/java/com/example/android/bluetoothchat/BluetoothChatFragment.java
      */
     private final Handler mBtHandler = new Handler() {
         @Override

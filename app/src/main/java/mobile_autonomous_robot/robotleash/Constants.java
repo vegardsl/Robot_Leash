@@ -2,6 +2,8 @@ package mobile_autonomous_robot.robotleash;
 
 /**
  * Created by vegarsl on 29.04.2016.
+ *
+ * https://pragprog.com/book/kbogla/opengl-es-2-for-android
  */
 public class Constants {
     public static final int BYTES_PER_FLOAT = 4;

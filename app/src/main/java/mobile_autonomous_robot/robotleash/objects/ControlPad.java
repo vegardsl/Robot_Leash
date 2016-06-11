@@ -9,7 +9,11 @@ import mobile_autonomous_robot.robotleash.programs.TextureShaderProgram;
 
 /**
  * Created by vegarsl on 29.04.2016.
+ *
+ * Code within this file is based on:
+ * Kevin Brothaler. OpenGL ES 2 for Android. The Pragmatic Programmers, 2013.
  */
+
 public class ControlPad {
     private static final int POSITION_COMPONENT_COUNT = 2;
     private static final int TEXTURE_COORDINATES_COMPONENT_COUNT = 2;

@@ -1,3 +1,8 @@
+/**
+ * Code within this file is based on:
+ * Kevin Brothaler. OpenGL ES 2 for Android. The Pragmatic Programmers, 2013.
+ */
+
 package mobile_autonomous_robot.robotleash;
 
 import android.content.Context;

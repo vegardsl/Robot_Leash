@@ -1,3 +1,10 @@
+/**
+ * All code within this file is copied from the "android-BluetoothChat" sample at
+ * https://github.com/googlesamples/android-BluetoothChat/blob/master/Application/src/main/java/com/example/android/bluetoothchat/BluetoothChatService.java
+ *
+ * Parts of the code has been modified to fit the needs of this project.
+ */
+
 package mobile_autonomous_robot.robotleash.bluetooth;
 
 import android.app.Service;
